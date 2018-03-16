@@ -1,0 +1,8 @@
+keras==2.0.8
+tqdm
+scikit-image
+scipy
+Pillow
+cython
+h5py
+opencv-python

@@ -1,0 +1,6 @@
+.ipynb_checkpoints/
+__pycache__/
+*.h5
+.idea/
+src/logs/
+src/images/
