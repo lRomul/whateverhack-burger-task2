@@ -125,7 +125,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         x = random.randint(x1, (x1 + x2) // 2)
         caption = "{} {:.3f}".format(label, score) if score else label
         ax.text(x1, y1 + 8, caption,
-                color='w', size=11, backgroundcolor="none")
+                color='b', size=11, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]

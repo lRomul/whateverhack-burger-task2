@@ -7,3 +7,4 @@ services:
     network_mode: host
     volumes:
       - ./src:/src
+      - ../data:/data

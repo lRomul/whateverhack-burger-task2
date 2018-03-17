@@ -1157,7 +1157,7 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
                     K.binary_crossentropy(target=y_true, output=y_pred),
                     tf.constant(0.0))
     loss = K.mean(loss)
-    loss = K.reshape(loss, [1, 1])
+    loss = K.reshape(loss, [1, 1]) * 0
     return loss
 
 
@@ -1189,6 +1189,13 @@ def load_image_gt(dataset, config, image_id, augment=False,
     # Load image and mask
     image = dataset.load_image(image_id)
     mask, class_ids = dataset.load_mask(image_id)
+
+    # Random horizontal flips.
+    if augment:
+        if random.randint(0, 1):
+            image = np.fliplr(image)
+            mask = np.fliplr(mask)
+
     shape = image.shape
     image, window, scale, padding = utils.resize_image(
         image,
@@ -1196,12 +1203,6 @@ def load_image_gt(dataset, config, image_id, augment=False,
         max_dim=config.IMAGE_MAX_DIM,
         padding=config.IMAGE_PADDING)
     mask = utils.resize_mask(mask, scale, padding)
-
-    # Random horizontal flips.
-    if augment:
-        if random.randint(0, 1):
-            image = np.fliplr(image)
-            mask = np.fliplr(mask)
 
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
@@ -2168,7 +2169,7 @@ class MaskRCNN():
         self.checkpoint_path = self.checkpoint_path.replace(
             "*epoch*", "{epoch:04d}")
 
-    def train(self, train_dataset, val_dataset, learning_rate, epochs, layers):
+    def train(self, train_dataset, val_dataset, learning_rate, epochs, layers, reset_epoch=False):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
@@ -2217,6 +2218,8 @@ class MaskRCNN():
         ]
 
         # Train
+        if reset_epoch:
+            self.epoch = 0
         log("\nStarting at epoch {}. LR={}\n".format(self.epoch, learning_rate))
         log("Checkpoint Path: {}".format(self.checkpoint_path))
         self.set_trainable(layers)

@@ -451,7 +451,7 @@ if __name__ == '__main__':
     else:
         model = modellib.MaskRCNN(mode="inference", config=config,
                                   model_dir=args.logs)
-
+1
     # Select weights file to load
     if args.model.lower() == "coco":
         model_path = COCO_MODEL_PATH

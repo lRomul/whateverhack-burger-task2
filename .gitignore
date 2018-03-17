@@ -4,3 +4,4 @@ __pycache__/
 .idea/
 src/logs/
 src/images/
+src/experiments/
