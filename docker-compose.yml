@@ -1,9 +1,9 @@
 version: '3'
 services:
-  whateverhack-task2:
+  hack2:
     build:
       context: .
-    image: whateverhack-task2
+    image: hack2
     network_mode: host
     volumes:
       - ./src:/src

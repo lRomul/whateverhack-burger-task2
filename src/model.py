@@ -29,6 +29,7 @@ import keras.engine as KE
 import keras.models as KM
 
 import utils
+import augs
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
@@ -1190,13 +1191,27 @@ def load_image_gt(dataset, config, image_id, augment=False,
     image = dataset.load_image(image_id)
     mask, class_ids = dataset.load_mask(image_id)
 
-    # Random horizontal flips.
-    if augment:
-        if random.randint(0, 1):
-            image = np.fliplr(image)
-            mask = np.fliplr(mask)
-
     shape = image.shape
+
+    # augmentations
+    if augment:
+        # print('before', image.shape, mask.shape)
+        image = image.copy()
+        mask = mask.copy()
+        if len(class_ids) == 0:
+            # print('1')
+            image = augs.augment_color(image)[0]
+            # print('2')
+        else:
+            # print('3')
+            image, mask = augs.augment_color(image, mask)
+            # print('4')
+            if len(mask.shape) == 2:
+                # print('5')
+                mask = mask[:, :, np.newaxis]
+                # print('6')
+        # print('after', image.shape, mask.shape)
+
     image, window, scale, padding = utils.resize_image(
         image,
         min_dim=config.IMAGE_MIN_DIM,
@@ -1207,6 +1222,7 @@ def load_image_gt(dataset, config, image_id, augment=False,
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
     _idx = np.sum(mask, axis=(0, 1)) > 0
+    # print(mask.shape, _idx.shape)
     mask = mask[:, :, _idx]
     class_ids = class_ids[_idx]
     # Bounding boxes. Note that some boxes might be all zeros
