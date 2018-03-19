@@ -2,6 +2,7 @@ import random
 import cv2
 import numpy as np
 import math
+from PIL import Image
 cv2.ocl.setUseOpenCL(False)
 
 
@@ -127,6 +128,10 @@ class RandomRotate90:
 
 
 class Rotate:
+    @staticmethod
+    def rotate(img, angle):
+        return np.array(Image.fromarray(img).rotate(angle))
+
     def __init__(self, limit=90, prob=.5):
         self.prob = prob
         self.limit = limit
@@ -137,20 +142,15 @@ class Rotate:
             # print('working Rotate')
             angle = random.uniform(-self.limit, self.limit)
             # print('R1')
-
-            height, width = img.shape[0:2]
-            # print('R2')
-            mat = cv2.getRotationMatrix2D((width/2, height/2), angle, 1.0)
-            # print('R3')
-            img = cv2.warpAffine(img, mat, (width, height),
-                                 flags=cv2.INTER_LINEAR,
-                                 borderMode=cv2.BORDER_REFLECT_101)
+            img = Rotate.rotate(img, angle)
             # print('R4')
             if mask is not None:
                 # print('R5')
-                mask = cv2.warpAffine(mask, mat, (width, height),
-                                      flags=cv2.INTER_LINEAR,
-                                      borderMode=cv2.BORDER_REFLECT_101)
+                # print(mask.shape)
+                if len(mask.shape) == 2:
+                    mask = mask[:, :, np.newaxis]
+                for ch in range(mask.shape[-1]):
+                    mask[:, :, ch] = Rotate.rotate(mask[:, :, ch], angle)
 
         return img, mask
 
@@ -521,5 +521,6 @@ def augment_a_little(x, mask=None):
 def augment_color(x, mask=None):
     return DualCompose([
         HorizontalFlip(prob=.5),
+        Rotate(limit=5, prob=.75),
         ImageOnly(RandomBrightness())
     ])(x, mask)

@@ -1203,13 +1203,12 @@ def load_image_gt(dataset, config, image_id, augment=False,
             image = augs.augment_color(image)[0]
             # print('2')
         else:
-            # print('3')
-            image, mask = augs.augment_color(image, mask)
-            # print('4')
             if len(mask.shape) == 2:
-                # print('5')
                 mask = mask[:, :, np.newaxis]
-                # print('6')
+            image, mask = augs.augment_color(image, mask)
+            if len(mask.shape) == 2:
+                mask = mask[:, :, np.newaxis]
+
         # print('after', image.shape, mask.shape)
 
     image, window, scale, padding = utils.resize_image(
