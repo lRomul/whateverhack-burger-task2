@@ -2,6 +2,7 @@
 __pycache__/
 *.h5
 .idea/
+data
 src/logs/
 src/images/
 src/experiments/

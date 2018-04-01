@@ -22,6 +22,8 @@ RUN apt-get update && \
         python-dev \
         libopencv-dev
 
+RUN apt-get install python3-tk
+
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
